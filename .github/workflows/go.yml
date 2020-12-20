@@ -54,7 +54,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build
-      run: env CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+      run: |
+        go get -v -t -d ./...
+        env CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
       
     - name: Docker hub push
       run: |
