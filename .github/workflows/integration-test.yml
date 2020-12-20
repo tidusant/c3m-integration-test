@@ -41,6 +41,7 @@ jobs:
   
   integration-test:
     if: ${{ contains(needs.check.outputs.isdeploy, 'true') }}    
+    needs: check
     runs-on: ubuntu-latest
     steps:
     - name: Check out integration code
