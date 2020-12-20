@@ -27,5 +27,5 @@ spec:
             - containerPort: 8081 #Exposes the port 8901 of the container test
           env:            
             - name: API_URL
-              value: "c3m-integration-test-service.colis-dev.svc.cluster.local:30081"            
+              value: "http://c3m-integration-test-service.colis-dev.svc.cluster.local:30081"
 
