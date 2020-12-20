@@ -25,5 +25,10 @@ spec:
           image: tidusant/c3m-integration-test:latest #Dockerhub image
           env:            
             - name: API_URL
-              value: "http://c3m-integration-test-service.colis-dev.svc.cluster.local:30081"
+              value: "http://c3madmin-portal.colis-dev.svc.cluster.local:30081"
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - ls -la
 
