@@ -1,8 +1,8 @@
-name: Dev deployment
+name: Integration Test
 env:
   SERVER: colis-dev
-  DEPLOY_NAME: c3m-integration-test
-  COMMIT_FILTER: DEPLOY
+  DEPLOY_NAME: c3madmin-portal
+  COMMIT_FILTER: TEST
   SLACK_COMMAND: "curl -X POST -H 'Content-type: application/json' --data"
 on:
   push:
@@ -39,44 +39,16 @@ jobs:
             ${SLACK_COMMAND} '{"text":"Start deploy ${DEPLOY_NAME} !"}' ${{secrets.SLACK_WEBHOOK_URL}}
           fi
   
-  build:
+  integration-test:
     if: ${{ contains(needs.check.outputs.isdeploy, 'true') }}
-    runs-on: ubuntu-latest    
-    needs: check
+    
+    runs-on: ubuntu-latest
     steps:
-
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.15
-
-    - name: Check out code into the Go module directory
+    - name: Check out integration code
       uses: actions/checkout@v2
-
-    - name: Build
+     
+    - name: Run test
       run: |
         go get -v -t -d ./...
-        env CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
-      
-    - name: Docker hub push
-      run: |
-        echo "====== Docker build ========"
-        echo ${{ secrets.DOCKER_TOKEN }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
-        docker build -t ${DEPLOY_NAME} .
-        docker tag ${DEPLOY_NAME} ${{ secrets.DOCKER_USERNAME }}/${DEPLOY_NAME}
-        docker push ${{ secrets.DOCKER_USERNAME }}/${DEPLOY_NAME}
-        ${SLACK_COMMAND} '{"text":"Push to docker done!"}' ${{secrets.SLACK_WEBHOOK_URL}}
-            
-  deploy:
-    if: ${{ contains(needs.check.outputs.isdeploy, 'true') }}
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: [check,build]
-    steps:
-    - name: Kubernetes deploy
-      run: |
-        sudo kubectl apply -f https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${{needs.check.outputs.branch}}/k8s_devdeploy.yml
-        #force pull latest image
-        sudo kubectl -n ${SERVER} rollout restart deploy ${DEPLOY_NAME}
-        ${SLACK_COMMAND} '{"text":"Kubernetes deploy done!"}' ${{secrets.SLACK_WEBHOOK_URL}}
-   
+        env API_URL=http://c3md-api.duyhf.com go run main.go    
+        ${SLACK_COMMAND} '{"text":"test Integration done!"}' ${{secrets.SLACK_WEBHOOK_URL}}
