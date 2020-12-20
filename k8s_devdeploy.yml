@@ -23,8 +23,6 @@ spec:
       containers:
         - name: c3m-integration-test #1st container
           image: tidusant/c3m-integration-test:latest #Dockerhub image
-          ports:
-            - containerPort: 8081 #Exposes the port 8901 of the container test
           env:            
             - name: API_URL
               value: "http://c3m-integration-test-service.colis-dev.svc.cluster.local:30081"
