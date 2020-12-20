@@ -40,8 +40,7 @@ jobs:
           fi
   
   integration-test:
-    if: ${{ contains(needs.check.outputs.isdeploy, 'true') }}
-    
+    if: ${{ contains(needs.check.outputs.isdeploy, 'true') }}    
     runs-on: ubuntu-latest
     steps:
     - name: Check out integration code
